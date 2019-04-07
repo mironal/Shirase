@@ -1,0 +1,24 @@
+.App {
+    display: flex;
+    height: 100%;
+}
+
+.Sidebar {
+    width: 10em;
+    background: rgb(243, 243, 243);
+    height: 100%;
+}
+
+.Viewer {
+    flex-grow: 1;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.NotificationFilter {
+    display: flex;
+}
+
+.NotificationFilter > :last-child {
+    margin-left: auto;
+}
