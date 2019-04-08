@@ -8,7 +8,9 @@ const Notification = (notification: ActivityListNotificationsResponseItem) => {
   const row = (
     <p key={notification.id}>
       <a href={notification.subject.url}>{notification.subject.title}</a>
-      {notification.repository.full_name}
+      <span>{notification.repository.full_name}</span>
+      <span> </span>
+      <span>{notification.reason}</span>
     </p>
   )
 
@@ -47,16 +49,16 @@ export default ({ notification, current }: ViewerProps) => {
   if (!notification.lastUpdates[current.url]) {
     return <div className="Viewer">Loading...</div>
   }
+  const ns = notification.notifications[current.url] || []
 
-  const filterd = notification.notifications[current.url].filter(n => {
+  const filterd = ns.filter(n => {
     if (onlyUnread) {
       return n.unread
     }
     return true
   })
-
-  const numOfFiltered =
-    notification.notifications[current.url].length - filterd.length
+  console.log(ns)
+  const numOfFiltered = ns.length - filterd.length
 
   return (
     <div className="Viewer">

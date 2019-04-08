@@ -1,12 +1,28 @@
 import React, { useState } from "react"
 import { Store, DefaultGithubEndpoint, GHConfig } from "./store"
 
-const EnterpriseForm = () => {
+const EnterpriseForm = ({
+  setPersonalToken,
+}: Pick<SidebarProps["ghConfigs"], "setPersonalToken">) => {
+  const [token, setToken] = useState("")
+  const [url, setUrl] = useState("")
+
   return (
     <div>
-      <input placeholder="enterprise url" />
-      <input type="password" placeholder="GitHub personal token" />
-      <button>Add Enterprise</button>
+      <input
+        placeholder="enterprise url"
+        value={url}
+        onChange={e => setUrl(e.target.value)}
+      />
+      <input
+        type="password"
+        placeholder="GitHub personal token"
+        value={token}
+        onChange={e => setToken(e.target.value)}
+      />
+      <button onClick={() => setPersonalToken(url, token)}>
+        Add Enterprise
+      </button>
     </div>
   )
 }
@@ -63,7 +79,7 @@ export default function({ ghConfigs, current }: SidebarProps) {
           Configure GitHub Token
         </button>
       )}
-      {personalToken.length > 0 && <EnterpriseForm />}
+      {personalToken.length > 0 && <EnterpriseForm {...ghConfigs} />}
     </div>
   )
 }

@@ -10,7 +10,9 @@ const token = storage.githubPersonalToken.get()
 
 function App() {
   const [lastUpdates, setLastUpdates] = useState({} as { [url: string]: Date })
-  const [currentConfig, setCurrentConfig] = useState(DefaultGithubEndpoint)
+  const [currentConfig, setCurrentConfig] = useState(
+    storage.currentConfig.get(),
+  )
   const [configs, setConfigs] = useState(token)
   const [notifications, setNotifications] = useState({
     [DefaultGithubEndpoint]: [] as ActivityListNotificationsResponseItem[],
@@ -87,7 +89,7 @@ function App() {
   }, 1000 * 60)
 
   useEffect(() => {
-    console.log("change currentConfig", currentConfig)
+    storage.currentConfig.set(currentConfig)
     fetchNotifications()
   }, [currentConfig])
 
