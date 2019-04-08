@@ -1,6 +1,7 @@
-import React, { useState } from "react"
+import React, { useState, SFC } from "react"
 import { Store } from "./store"
 import { ActivityListNotificationsResponseItem } from "@octokit/rest"
+import classnames from "classnames"
 
 export type ViewerProps = Pick<Store, "notification" | "current">
 
@@ -53,11 +54,23 @@ const NotificationFilter = ({
   )
 }
 
+const DIV: SFC = ({ children }) => <div className="Viewer">{children}</div>
+
 export default ({ notification, current }: ViewerProps) => {
   const [onlyUnread, setOnlyUnread] = useState(true)
 
+  if (notification.errors[current.url]) {
+    return (
+      <DIV>
+        <p className="error">
+          Error: {notification.errors[current.url].message}
+        </p>
+      </DIV>
+    )
+  }
+
   if (!notification.lastUpdates[current.url]) {
-    return <div className="Viewer">Loading...</div>
+    return <DIV>Loading...</DIV>
   }
   const ns = notification.notifications[current.url] || []
 
@@ -71,7 +84,7 @@ export default ({ notification, current }: ViewerProps) => {
   const numOfFiltered = ns.length - filterd.length
 
   return (
-    <div className="Viewer">
+    <DIV>
       <NotificationFilter
         {...{ numOfFiltered, onlyUnread, onChangeOnlyUnread: setOnlyUnread }}
       />
@@ -81,6 +94,6 @@ export default ({ notification, current }: ViewerProps) => {
           Last updated at: {notification.lastUpdates[current.url].toUTCString()}
         </span>
       </p>
-    </div>
+    </DIV>
   )
 }

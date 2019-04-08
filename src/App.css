@@ -29,6 +29,11 @@
     overflow-y: auto;
 }
 
+.Viewer p.error {
+    color:#dc2525;
+    font-weight: bold;
+}
+
 .NotificationFilter {
     display: flex;
 }

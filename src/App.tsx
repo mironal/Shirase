@@ -17,6 +17,8 @@ function App() {
   const [notifications, setNotifications] = useState({
     [DefaultGithubEndpoint]: [] as ActivityListNotificationsResponseItem[],
   })
+
+  const [errors, setErrors] = useState({} as Store["notification"]["errors"])
   const store: Store = {
     current: {
       url: currentConfig,
@@ -40,6 +42,16 @@ function App() {
       },
     },
     notification: {
+      errors,
+      setError: (url: string, error: Error | null) => {
+        const errs = { ...errors }
+        if (error) {
+          errs[url] = error
+        } else {
+          delete errs[url]
+        }
+        setErrors(errs)
+      },
       lastUpdates,
       setLastUpdates: (url: string, date: Date) => {
         setLastUpdates({
@@ -68,10 +80,18 @@ function App() {
         auth: personalToken,
       })
 
-      const result = await client.activity.listNotifications({ all: true })
-      store.notification.setLastUpdates(url, new Date())
-      if (result.status === 200) {
-        store.notification.setNotifications(url, result.data)
+      const result = await client.activity
+        .listNotifications({ all: true })
+        .catch(error => {
+          console.error("Error listNotifications", error)
+          store.notification.setError(url, error)
+        })
+      if (result) {
+        store.notification.setError(url, null)
+        store.notification.setLastUpdates(url, new Date())
+        if (result.status === 200) {
+          store.notification.setNotifications(url, result.data)
+        }
       }
     }
   }

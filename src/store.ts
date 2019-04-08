@@ -18,6 +18,8 @@ export interface Store {
     deletePersonalToken: (url: string) => void
   }
   notification: {
+    errors: { [url: string]: Error }
+    setError: (url: string, error: Error | null) => void
     lastUpdates: { [url: string]: Date }
     setLastUpdates: (url: string, date: Date) => void
     notifications: { [url: string]: ActivityListNotificationsResponseItem[] }
