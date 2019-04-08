@@ -4,13 +4,23 @@ import { ActivityListNotificationsResponseItem } from "@octokit/rest"
 
 export type ViewerProps = Pick<Store, "notification" | "current">
 
+const htmlURLFromApiURL = (url: string): string => {
+  return url
+    .replace("https://api.github.com/repos/", "https://github.com/")
+    .replace("/api/v3/repos/", "")
+    .replace("/pulls/", "/pull/")
+}
+
 const Notification = (notification: ActivityListNotificationsResponseItem) => {
   const row = (
     <p key={notification.id}>
-      <a href={notification.subject.url}>{notification.subject.title}</a>
+      <a target="_blank" href={htmlURLFromApiURL(notification.subject.url)}>
+        {notification.subject.title}
+      </a>
       <span>{notification.repository.full_name}</span>
       <span> </span>
       <span>{notification.reason}</span>
+      {notification.unread && <button>Mark as Read</button>}
     </p>
   )
 
@@ -57,6 +67,7 @@ export default ({ notification, current }: ViewerProps) => {
     }
     return true
   })
+
   const numOfFiltered = ns.length - filterd.length
 
   return (
