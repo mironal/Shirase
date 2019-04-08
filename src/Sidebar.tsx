@@ -63,25 +63,27 @@ export default function({ ghConfigs, current }: SidebarProps) {
   return (
     <div className="Sidebar">
       <ConfigList {...{ ghConfigs, current }} />
-      <input
-        type="password"
-        placeholder="GitHub personal token"
-        value={token}
-        onChange={e => setToken(e.target.value)}
-      />
-      {personalToken.length > 0 ? (
-        <button onClick={() => deletePersonalToken(DefaultGithubEndpoint)}>
-          Delete token
-        </button>
-      ) : (
-        <button
-          onClick={() => setPersonalToken(DefaultGithubEndpoint, token)}
-          disabled={token.length === 0}
-        >
-          Configure GitHub Token
-        </button>
-      )}
-      {personalToken.length > 0 && <EnterpriseForm {...ghConfigs} />}
+      <div>
+        <input
+          type="password"
+          placeholder="GitHub personal token"
+          value={token}
+          onChange={e => setToken(e.target.value)}
+        />
+        {personalToken.length > 0 ? (
+          <button onClick={() => deletePersonalToken(DefaultGithubEndpoint)}>
+            Delete token
+          </button>
+        ) : (
+          <button
+            onClick={() => setPersonalToken(DefaultGithubEndpoint, token)}
+            disabled={token.length === 0}
+          >
+            Configure GitHub Token
+          </button>
+        )}
+        {personalToken.length > 0 && <EnterpriseForm {...ghConfigs} />}
+      </div>
     </div>
   )
 }

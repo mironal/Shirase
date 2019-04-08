@@ -4,9 +4,15 @@
 }
 
 .Sidebar {
+    display: flex;
+    flex-direction: column;
     width: 13em;
     background: rgb(243, 243, 243);
     height: 100%;
+}
+
+.Sidebar > :last-child {
+    margin-top: auto;
 }
 
 .Sidebar input[type="password"] {
