@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect } from "react"
 import "./App.css"
 import Sidebar from "./Sidebar"
 import Viewer from "./Viewer"
@@ -84,9 +84,12 @@ function App() {
     }
   }, [configs])
 
-  setTimeout(() => {
-    fetchNotifications()
-  }, 1000 * 60)
+  useEffect(() => {
+    const id = setInterval(() => {
+      fetchNotifications()
+    }, 1000 * 60)
+    return () => clearInterval(id)
+  }, [])
 
   useEffect(() => {
     storage.currentConfig.set(currentConfig)

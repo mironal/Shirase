@@ -57,7 +57,6 @@ export default ({ notification, current }: ViewerProps) => {
     }
     return true
   })
-  console.log(ns)
   const numOfFiltered = ns.length - filterd.length
 
   return (
@@ -68,8 +67,7 @@ export default ({ notification, current }: ViewerProps) => {
       {filterd.map(Notification)}
       <p>
         <span>
-          Last updated at:{" "}
-          {notification.lastUpdates[current.url].toDateString()}
+          Last updated at: {notification.lastUpdates[current.url].toUTCString()}
         </span>
       </p>
     </div>
