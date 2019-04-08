@@ -38,7 +38,7 @@ const Config = ({
 }) => {
   return (
     <li onClick={() => current.set(config.url)}>
-      {config.url.replace("https://", "")}
+      {config.url.replace("https://", "").replace("/api/v3", "")}
     </li>
   )
 }
