@@ -10,6 +10,7 @@ const EnterpriseForm = ({
   return (
     <div>
       <input
+        type="text"
         placeholder="enterprise url"
         value={url}
         onChange={e => setUrl(e.target.value)}
@@ -20,6 +21,7 @@ const EnterpriseForm = ({
         value={token}
         onChange={e => setToken(e.target.value)}
       />
+      <p className="small">Enter: https://your.ghe.domain/api/v3</p>
       <button onClick={() => setPersonalToken(url, token)}>
         Add Enterprise
       </button>
