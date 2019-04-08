@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import { Store, DefaultGithubEndpoint, GHConfig } from "./store"
+import classnames from "classnames"
 
 const EnterpriseForm = ({
   setPersonalToken,
@@ -39,7 +40,10 @@ const Config = ({
   current: SidebarProps["current"]
 }) => {
   return (
-    <li onClick={() => current.set(config.url)}>
+    <li
+      className={classnames("Config", { active: current.url === config.url })}
+      onClick={() => current.set(config.url)}
+    >
       {config.url.replace("https://", "").replace("/api/v3", "")}
     </li>
   )
@@ -47,7 +51,7 @@ const Config = ({
 
 const ConfigList = ({ ghConfigs, current }: SidebarProps) => {
   return (
-    <ul>
+    <ul className="ConfigList">
       {Object.values(ghConfigs.configs).map(config => (
         <Config key={config.url} {...{ config, current }} />
       ))}

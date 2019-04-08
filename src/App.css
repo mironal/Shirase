@@ -40,3 +40,16 @@
 p.small {
     font-size: x-small;
 }
+
+.ConfigList {
+    list-style-type: none;
+    padding-left: 0.6em;
+}
+
+.Config {
+    color: gray;
+}
+
+.Config.active {
+    color: black;
+}
