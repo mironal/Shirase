@@ -1,11 +1,9 @@
-import { Store, DefaultGithubEndpoint } from "./store"
+import { State, DefaultGithubEndpoint } from "./store"
 
 const makeKey = (key: string) => `SHIRASE_${key}`
 
 const GithubPersonalTokenKey = makeKey("Github_personal_token")
-const storeGithubPersonalToken = (
-  configs: Store["ghConfigs"]["configs"] | null,
-) => {
+const storeGithubPersonalToken = (configs: State["ghConfigs"] | null) => {
   if (configs && Object.keys(configs).length > 0) {
     localStorage.setItem(GithubPersonalTokenKey, JSON.stringify(configs))
   } else {
@@ -16,7 +14,7 @@ const storeGithubPersonalToken = (
 const restoreGithubConfig = () => {
   const str = localStorage.getItem(GithubPersonalTokenKey)
   if (str !== null) {
-    return JSON.parse(str) as Store["ghConfigs"]["configs"]
+    return JSON.parse(str) as State["ghConfigs"]
   }
 
   return {
@@ -24,7 +22,7 @@ const restoreGithubConfig = () => {
       url: DefaultGithubEndpoint,
       personalToken: "",
     },
-  } as Store["ghConfigs"]["configs"]
+  } as State["ghConfigs"]
 }
 
 const GithubCurrentConfigKey = makeKey("Github_Current_Config")

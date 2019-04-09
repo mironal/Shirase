@@ -1,10 +1,10 @@
 import React, { useState } from "react"
-import { Store, DefaultGithubEndpoint, GHConfig } from "./store"
+import { DefaultGithubEndpoint, State } from "./store"
 import classnames from "classnames"
 
 const EnterpriseForm = ({
   setPersonalToken,
-}: Pick<SidebarProps["ghConfigs"], "setPersonalToken">) => {
+}: Pick<SidebarProps, "setPersonalToken">) => {
   const [token, setToken] = useState("")
   const [url, setUrl] = useState("")
 
@@ -30,43 +30,45 @@ const EnterpriseForm = ({
   )
 }
 
-export type SidebarProps = Pick<Store, "ghConfigs" | "current">
+export type SidebarProps = Pick<State, "currentUrl" | "ghConfigs"> & {
+  setPersonalToken(url: string, token: string): void
+  removePersonalToken(url: string): void
+  setCurrentUrl(url: string): void
+}
 
 const Config = ({
-  config,
-  current,
-}: {
-  config: GHConfig
-  current: SidebarProps["current"]
-}) => {
+  url,
+  currentUrl,
+  setCurrentUrl,
+}: Pick<SidebarProps, "currentUrl" | "setCurrentUrl"> & { url: string }) => {
   return (
     <li
-      className={classnames("Config", { active: current.url === config.url })}
-      onClick={() => current.set(config.url)}
+      className={classnames("Config", { active: currentUrl === url })}
+      onClick={() => setCurrentUrl(url)}
     >
-      {config.url.replace("https://", "").replace("/api/v3", "")}
+      {url.replace("https://", "").replace("/api/v3", "")}
     </li>
   )
 }
 
-const ConfigList = ({ ghConfigs, current }: SidebarProps) => {
+const ConfigList = ({ ghConfigs, currentUrl, setCurrentUrl }: SidebarProps) => {
   return (
     <ul className="ConfigList">
-      {Object.values(ghConfigs.configs).map(config => (
-        <Config key={config.url} {...{ config, current }} />
+      {Object.keys(ghConfigs).map(url => (
+        <Config key={url} {...{ url, currentUrl, setCurrentUrl }} />
       ))}
     </ul>
   )
 }
 
-export default function({ ghConfigs, current }: SidebarProps) {
-  const { configs, setPersonalToken, deletePersonalToken } = ghConfigs
-  const personalToken = configs[DefaultGithubEndpoint].personalToken
-  const [token, setToken] = useState(personalToken)
+export default function(props: SidebarProps) {
+  const { ghConfigs, removePersonalToken, setPersonalToken } = props
 
+  const personalToken = ghConfigs[DefaultGithubEndpoint].personalToken
+  const [token, setToken] = useState(personalToken)
   return (
     <div className="Sidebar">
-      <ConfigList {...{ ghConfigs, current }} />
+      <ConfigList {...props} />
       <div>
         <input
           type="password"
@@ -75,7 +77,7 @@ export default function({ ghConfigs, current }: SidebarProps) {
           onChange={e => setToken(e.target.value)}
         />
         {personalToken.length > 0 ? (
-          <button onClick={() => deletePersonalToken(DefaultGithubEndpoint)}>
+          <button onClick={() => removePersonalToken(DefaultGithubEndpoint)}>
             Delete token
           </button>
         ) : (
@@ -86,7 +88,7 @@ export default function({ ghConfigs, current }: SidebarProps) {
             Configure GitHub Token
           </button>
         )}
-        {personalToken.length > 0 && <EnterpriseForm {...ghConfigs} />}
+        {personalToken.length > 0 && <EnterpriseForm {...props} />}
       </div>
     </div>
   )

@@ -1,79 +1,16 @@
-import React, { useState, useEffect } from "react"
+import React, { useEffect, useReducer } from "react"
 import "./App.css"
 import Sidebar from "./Sidebar"
 import Viewer from "./Viewer"
-import { Store, DefaultGithubEndpoint } from "./store"
+import { reducer, initialState } from "./store"
 import storage from "./storage"
-import Octokit, { ActivityListNotificationsResponseItem } from "@octokit/rest"
-
-const token = storage.githubPersonalToken.get()
+import Octokit from "@octokit/rest"
 
 function App() {
-  const [lastUpdates, setLastUpdates] = useState({} as { [url: string]: Date })
-  const [currentConfig, setCurrentConfig] = useState(
-    storage.currentConfig.get(),
-  )
-  const [configs, setConfigs] = useState(token)
-  const [notifications, setNotifications] = useState({
-    [DefaultGithubEndpoint]: [] as ActivityListNotificationsResponseItem[],
-  })
-
-  const [errors, setErrors] = useState({} as Store["notification"]["errors"])
-  const store: Store = {
-    current: {
-      url: currentConfig,
-      set: setCurrentConfig,
-    },
-    ghConfigs: {
-      configs,
-      setPersonalToken: (url: string, personalToken: string) => {
-        setConfigs({ ...configs, ...{ [url]: { url, personalToken } } })
-      },
-      deletePersonalToken: (url: string) => {
-        const cfgs = { ...configs }
-
-        if (url === DefaultGithubEndpoint) {
-          cfgs[url] = { url: DefaultGithubEndpoint, personalToken: "" }
-        } else {
-          delete cfgs[url]
-        }
-
-        setConfigs(cfgs)
-      },
-    },
-    notification: {
-      errors,
-      setError: (url: string, error: Error | null) => {
-        const errs = { ...errors }
-        if (error) {
-          errs[url] = error
-        } else {
-          delete errs[url]
-        }
-        setErrors(errs)
-      },
-      lastUpdates,
-      setLastUpdates: (url: string, date: Date) => {
-        setLastUpdates({
-          ...lastUpdates,
-          ...{ [url]: date },
-        })
-      },
-      notifications,
-      setNotifications: (
-        url: string,
-        ns: ActivityListNotificationsResponseItem[],
-      ) => {
-        setNotifications({
-          ...notifications,
-          ...{ [url]: ns },
-        })
-      },
-    },
-  }
+  const [state, dispatch] = useReducer(reducer, initialState())
 
   const fetchNotifications = async () => {
-    const { url, personalToken } = configs[currentConfig]
+    const { url, personalToken } = state.ghConfigs[state.currentUrl]
     if (personalToken.length > 0) {
       const client = new Octokit({
         baseUrl: url,
@@ -84,25 +21,25 @@ function App() {
         .listNotifications({ all: true })
         .catch(error => {
           console.error("Error listNotifications", error)
-          store.notification.setError(url, error)
+          dispatch({ type: "setError", url, error })
         })
       if (result) {
-        store.notification.setError(url, null)
-        store.notification.setLastUpdates(url, new Date())
+        dispatch({ type: "clearError", url })
+        dispatch({ type: "setLastUpdate", url, date: new Date() })
         if (result.status === 200) {
-          store.notification.setNotifications(url, result.data)
+          dispatch({ type: "setNotification", url, notifications: result.data })
         }
       }
     }
   }
 
   useEffect(() => {
-    if (Object.keys(configs).length === 0) {
+    if (Object.keys(state.ghConfigs).length === 0) {
       storage.githubPersonalToken.set(null)
     } else {
-      storage.githubPersonalToken.set(configs)
+      storage.githubPersonalToken.set(state.ghConfigs)
     }
-  }, [configs])
+  }, [state.ghConfigs])
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -112,14 +49,23 @@ function App() {
   }, [])
 
   useEffect(() => {
-    storage.currentConfig.set(currentConfig)
+    storage.currentConfig.set(state.currentUrl)
     fetchNotifications()
-  }, [currentConfig])
+  }, [state.currentUrl])
 
   return (
     <div className="App">
-      <Sidebar {...store} />
-      <Viewer {...store} />
+      <Sidebar
+        {...state}
+        setCurrentUrl={url => dispatch({ type: "setCurrentUrl", url })}
+        setPersonalToken={(url, token) =>
+          dispatch({ type: "setPersonalToken", url, token })
+        }
+        removePersonalToken={url =>
+          dispatch({ type: "removePersonalToken", url })
+        }
+      />
+      <Viewer {...state} />
     </div>
   )
 }

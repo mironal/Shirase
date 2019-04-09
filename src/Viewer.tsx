@@ -1,9 +1,12 @@
 import React, { useState, SFC } from "react"
-import { Store } from "./store"
+import { State } from "./store"
 import { ActivityListNotificationsResponseItem } from "@octokit/rest"
 import classnames from "classnames"
 
-export type ViewerProps = Pick<Store, "notification" | "current">
+export type ViewerProps = Pick<
+  State,
+  "notifications" | "errors" | "currentUrl" | "lastUpdates"
+>
 
 const htmlURLFromApiURL = (url: string): string => {
   return url
@@ -56,23 +59,22 @@ const NotificationFilter = ({
 
 const DIV: SFC = ({ children }) => <div className="Viewer">{children}</div>
 
-export default ({ notification, current }: ViewerProps) => {
+export default (props: ViewerProps) => {
+  const { notifications, currentUrl, errors, lastUpdates } = props
   const [onlyUnread, setOnlyUnread] = useState(true)
 
-  if (notification.errors[current.url]) {
+  if (errors[currentUrl]) {
     return (
       <DIV>
-        <p className="error">
-          Error: {notification.errors[current.url].message}
-        </p>
+        <p className="error">Error: {errors[currentUrl].message}</p>
       </DIV>
     )
   }
 
-  if (!notification.lastUpdates[current.url]) {
+  if (!lastUpdates[currentUrl] || !notifications[currentUrl]) {
     return <DIV>Loading...</DIV>
   }
-  const ns = notification.notifications[current.url] || []
+  const ns = notifications[currentUrl] || []
 
   const filterd = ns.filter(n => {
     if (onlyUnread) {
@@ -90,9 +92,7 @@ export default ({ notification, current }: ViewerProps) => {
       />
       {filterd.map(Notification)}
       <p>
-        <span>
-          Last updated at: {notification.lastUpdates[current.url].toUTCString()}
-        </span>
+        <span>Last updated at: {lastUpdates[currentUrl].toUTCString()}</span>
       </p>
     </DIV>
   )
