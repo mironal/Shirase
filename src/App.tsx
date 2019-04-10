@@ -11,8 +11,8 @@ const lastModified: { [url: string]: string } = {}
 function App() {
   const [state, dispatch] = useReducer(reducer, initialState())
 
-  const fetchNotifications = useCallback(async () => {
-    const { url, personalToken } = state.ghConfigs[state.currentUrl]
+  const fetchNotifications = async (url: string) => {
+    const { personalToken } = state.ghConfigs[url]
     if (personalToken.length > 0) {
       const client = new Octokit({
         baseUrl: url,
@@ -54,7 +54,7 @@ function App() {
         }
       }
     }
-  }, [])
+  }
 
   useEffect(() => {
     if (Object.keys(state.ghConfigs).length === 0) {
@@ -72,15 +72,16 @@ function App() {
         }
       })
     }
-    const id = setInterval(() => {
-      fetchNotifications()
-    }, 1000 * 60)
-    return () => clearInterval(id)
   }, [])
 
   useEffect(() => {
     storage.currentConfig.set(state.currentUrl)
-    fetchNotifications()
+    fetchNotifications(state.currentUrl)
+
+    const id = setInterval(() => {
+      fetchNotifications(state.currentUrl)
+    }, 1000 * 60)
+    return () => clearInterval(id)
   }, [state.currentUrl])
 
   return (

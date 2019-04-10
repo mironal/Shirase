@@ -1,6 +1,7 @@
 import { ActivityListNotificationsResponseItem } from "@octokit/rest"
 import storage from "./storage"
 import { Reducer } from "react"
+import { node } from "prop-types"
 
 export const DefaultGithubEndpoint = "https://api.github.com"
 
@@ -34,10 +35,19 @@ export type Action =
       notifications: ActivityListNotificationsResponseItem[]
     }
 
-export const reducer: Reducer<State, Action> = (
-  state: State,
-  action: Action,
-) => {
+export const reducer: Reducer<State, Action> = (state, action) => {
+  const next = r(state, action)
+  if (process.env.NODE_ENV !== "production") {
+    console.log("[Dispatch]", {
+      action,
+      prev: state,
+      next,
+    })
+  }
+  return next
+}
+
+const r: Reducer<State, Action> = (state: State, action: Action) => {
   switch (action.type) {
     case "setPersonalToken": {
       const ghConfigs = {
