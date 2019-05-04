@@ -1,7 +1,6 @@
 import React, { useState, SFC } from "react"
 import { State } from "./store"
 import { ActivityListNotificationsResponseItem } from "@octokit/rest"
-import classnames from "classnames"
 
 export type ViewerProps = Pick<
   State,
@@ -18,7 +17,11 @@ const htmlURLFromApiURL = (url: string): string => {
 const Notification = (notification: ActivityListNotificationsResponseItem) => {
   const row = (
     <p key={notification.id}>
-      <a target="_blank" href={htmlURLFromApiURL(notification.subject.url)}>
+      <a
+        target="_blank"
+        rel="noopener noreferrer"
+        href={htmlURLFromApiURL(notification.subject.url)}
+      >
         {notification.subject.title}
       </a>
       <span>{notification.repository.full_name}</span>

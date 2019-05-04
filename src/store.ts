@@ -1,7 +1,6 @@
 import { ActivityListNotificationsResponseItem } from "@octokit/rest"
 import storage from "./storage"
 import { Reducer } from "react"
-import { node } from "prop-types"
 
 export const DefaultGithubEndpoint = "https://api.github.com"
 
@@ -84,6 +83,8 @@ const r: Reducer<State, Action> = (state: State, action: Action) => {
       }
       return { ...state, notifications }
     }
+    default:
+      throw new Error(`Unknown type: ${action}`)
   }
 }
 

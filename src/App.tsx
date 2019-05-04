@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useCallback, useRef } from "react"
+import React, { useEffect, useReducer } from "react"
 import "./App.css"
 import Sidebar from "./Sidebar"
 import Viewer from "./Viewer"
