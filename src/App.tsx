@@ -82,7 +82,7 @@ function App() {
       fetchNotifications(state.currentUrl)
     }, 1000 * 60)
     return () => clearInterval(id)
-  }, [state.currentUrl])
+  })
 
   return (
     <div className="App">
